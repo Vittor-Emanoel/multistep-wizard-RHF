@@ -1,6 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
+import { safeSessionStorageGetItem } from "@/lib/utils";
+import { useEffect } from "react";
 import { z } from "zod";
 import { StepHeader } from "../StepHeader";
 import { StepperFooter, StepperNextButton } from "../Stepper";
@@ -16,20 +18,46 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export function AccountStep() {
+  const initialValue = safeSessionStorageGetItem<FormData>("account-step");
+
   const {
     register,
     handleSubmit: hookFormSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isDirty },
   } = useForm<FormData>({
+    disabled: !!initialValue,
     resolver: zodResolver(schema),
+    defaultValues: {
+      email: initialValue?.email ?? "",
+      password: initialValue?.password ?? "",
+    },
   });
 
   const { nextStep } = useStepper();
 
-  const handleSubmit = hookFormSubmit(async (data) => {
-    console.log(data);
+  useEffect(() => {
+    if (isDirty) {
+      window.onbeforeunload = () => {
+        return "";
+      };
+    }
 
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    return () => {
+      window.onbeforeunload = null;
+    };
+  }, [isDirty]);
+
+  const handleSubmit = hookFormSubmit(async (formData) => {
+    if (!initialValue) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      sessionStorage.setItem(
+        "account-step",
+        JSON.stringify({
+          ...formData,
+          password: "*".repeat(formData.password.length),
+        }),
+      );
+    }
 
     nextStep();
   });
