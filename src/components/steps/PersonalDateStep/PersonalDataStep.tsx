@@ -1,50 +1,22 @@
-import { zodResolver } from "@hookform/resolvers/zod";
+import { FormData } from "@/App";
 import { Label } from "@radix-ui/react-label";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { StepHeader } from "../StepHeader";
+import { useFormContext } from "react-hook-form";
+import { StepHeader } from "../../StepHeader";
 import {
   StepperFooter,
   StepperNextButton,
   StepperPreviousButton,
-} from "../Stepper";
-import { useStepper } from "../Stepper/useStepper";
-import { Input } from "../ui/Input";
-
-const schema = z.object({
-  firstName: z.string().min(1, "Informe o seu primeiro nome"),
-  lastName: z.string().min(1, "Informe o seu sobrenome"),
-  document: z.string().min(1, "Informe o CPF"),
-});
-
-type FormData = z.infer<typeof schema>;
+} from "../../Stepper";
+import { Input } from "../../ui/Input";
 
 export function PersonalDataStep() {
   const {
     register,
-    handleSubmit: hookFormSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<FormData>({
-    resolver: zodResolver(schema),
-    defaultValues: {
-      document: "",
-      firstName: "",
-      lastName: "",
-    },
-  });
-
-  const { nextStep } = useStepper();
-
-  const handleSubmit = hookFormSubmit(async (data) => {
-    console.log(data);
-
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    nextStep();
-  });
+  } = useFormContext<FormData["personalStep"]>();
 
   return (
-    <form onSubmit={handleSubmit}>
+    <div>
       <StepHeader
         title="Dados pessoais"
         description="Conte-nos mais sobre voce"
@@ -90,6 +62,6 @@ export function PersonalDataStep() {
           disabled={isSubmitting}
         />
       </StepperFooter>
-    </form>
+    </div>
   );
 }

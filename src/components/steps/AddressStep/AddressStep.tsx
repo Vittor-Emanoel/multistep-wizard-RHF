@@ -1,46 +1,19 @@
+import { FormData } from "@/App";
 import { Label } from "@/components/ui/Label";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { StepHeader } from "../StepHeader";
-import { StepperFooter, StepperPreviousButton } from "../Stepper";
-import { Button } from "../ui/Button";
-import { Input } from "../ui/Input";
-
-const schema = z.object({
-  state: z.string().min(1, "Informe o seu Estado"),
-  city: z.string().min(1, "Informe a sua Cidade"),
-  street: z.string().min(1, "Informe a sua Rua"),
-});
-
-type FormData = z.infer<typeof schema>;
+import { useFormContext } from "react-hook-form";
+import { StepHeader } from "../../StepHeader";
+import { StepperFooter, StepperPreviousButton } from "../../Stepper";
+import { Button } from "../../ui/Button";
+import { Input } from "../../ui/Input";
 
 export function AddressStep() {
   const {
     register,
-    handleSubmit: hookFormSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<FormData>({
-    resolver: zodResolver(schema),
-    defaultValues: {
-      state: "",
-      city: "",
-      street: "",
-    },
-  });
-
-  // const { nextStep } = useStepper();
-
-  const handleSubmit = hookFormSubmit(async (data) => {
-    console.log(data);
-
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    //redireciona
-  });
+  } = useFormContext<FormData["addressStep"]>();
 
   return (
-    <form onSubmit={handleSubmit}>
+    <div>
       <StepHeader title="Endereco" description="De onde voce e ?" />
 
       <fieldset className="space-y-4">
@@ -75,6 +48,6 @@ export function AddressStep() {
           Finalizar
         </Button>
       </StepperFooter>
-    </form>
+    </div>
   );
 }
