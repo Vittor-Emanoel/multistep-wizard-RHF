@@ -38,7 +38,7 @@ export function Stepper({ steps, initialStep = 0 }: StepperProps) {
               key={step.label}
               className={cn(
                 "inline-block text-xs px-2 py-1 rounded-md",
-                index === currentStep && "bg-primary text-primary-foreground"
+                index === currentStep && "bg-primary text-primary-foreground",
               )}
             >
               {String(index + 1).padStart(2, "0")}. {step.label}
@@ -85,17 +85,13 @@ export function StepperPreviousButton({
 export function StepperNextButton({
   size = "sm",
   type = "button",
-  preventDefault = false,
+  onClick,
   ...props
-}: Omit<React.ComponentPropsWithoutRef<typeof Button>, "onClick"> & {
-  preventDefault?: boolean;
-}) {
+}: React.ComponentPropsWithoutRef<typeof Button>) {
   const { nextStep } = useStepper();
 
-  const nextStepHandler = !preventDefault ? nextStep : undefined;
-
   return (
-    <Button size={size} type={type} onClick={nextStepHandler} {...props}>
+    <Button size={size} type={type} onClick={onClick ?? nextStep} {...props}>
       Proximo
     </Button>
   );
